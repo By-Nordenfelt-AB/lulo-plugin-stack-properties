@@ -10,6 +10,7 @@ $ npm install lulo-plugin-stack-properties --save
 ##Usage
 ### Properties
 * `StackName`: Name or ID of the Stack you want to describe. Required
+
 ### Return Values
 The resource will return every Parameter, Output and Resource of the stack.
 Each return value can be access using the
