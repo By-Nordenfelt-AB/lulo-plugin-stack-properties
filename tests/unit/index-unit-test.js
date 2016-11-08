@@ -6,9 +6,8 @@ var sinon = require('sinon');
 
 describe('Index unit tests', function () {
     var subject;
-    var readJobStub;
-    var notifyStub;
-    var updateObjectsMetadataStub;
+    var listStackResourcesStub = sinon.stub();
+    var describeStacksStub = sinon.stub();
     var event;
 
     before(function () {
@@ -17,39 +16,24 @@ describe('Index unit tests', function () {
             warnOnUnregistered: false
         });
 
-        readJobStub = sinon.stub();
-        notifyStub = sinon.stub();
-        updateObjectsMetadataStub = sinon.stub();
-
-        var elasticTranscoderMock = {
-            readJob: readJobStub,
-            getCallbackUrl: sinon.stub(),
-            getDestinationBucket: sinon.stub(),
-            getAudioFiles: sinon.stub()
-        };
-        var s3Mock = {
-            updateObjectsMetadata: updateObjectsMetadataStub
-        };
-        var serviceMock = {
-            notify: notifyStub
+        var awsSdkStub = {
+            CloudFormation: function () {
+                this.listStackResources = listStackResourcesStub;
+                this.describeStacks = describeStacksStub;
+            }
         };
 
-        mockery.registerMock('./lib/elastic-transcoder', elasticTranscoderMock);
-        mockery.registerMock('./lib/s3', s3Mock);
-        mockery.registerMock('./lib/service', serviceMock);
+        mockery.registerMock('aws-sdk', awsSdkStub);
         subject = require('../../src/index');
     });
     beforeEach(function () {
-        readJobStub.reset().resetBehavior();
-        readJobStub.yields(null, { Status: 'Complete' });
-        notifyStub.reset().resetBehavior();
-        notifyStub.yields(null);
-        updateObjectsMetadataStub.reset().resetBehavior();
-        updateObjectsMetadataStub.yields();
+        listStackResourcesStub.reset().resetBehavior();
+        listStackResourcesStub.yields(null, { StackResourceSummaries: [{}] });
+        describeStacksStub.reset().resetBehavior();
+        describeStacksStub.yields(null, { Stacks: [{ Outputs: [{}], Parameters: [{}] }] });
 
-        var message = JSON.stringify({ jobId: '123' });
         event = {
-            Records: [{ Sns: { Message: message } }]
+            ResourceProperties: { StackName: 'StackName' }
         };
     });
     after(function () {
@@ -57,33 +41,70 @@ describe('Index unit tests', function () {
         mockery.disable();
     });
 
-    describe('handler', function () {
+    describe('validate', function () {
         it('should succeed', function (done) {
-            subject.handler(event, {}, function (error) {
+            subject.validate(event);
+            done();
+        });
+        it('should fail if stack name is not set', function (done) {
+            delete event.ResourceProperties.StackName;
+            function fn () {
+                subject.validate(event);
+            }
+            expect(fn).to.throw(/Missing required property StackName/);
+            done();
+        });
+    });
+
+    describe('create', function () {
+        it('should succeed', function (done) {
+            subject.create(event, {}, function (error, response) {
                 expect(error).to.equal(null);
-                expect(readJobStub.calledOnce).to.equal(true);
-                expect(notifyStub.calledOnce).to.equal(true);
-                expect(updateObjectsMetadataStub.calledOnce).to.equal(true);
+                expect(response).to.be.an('object');
                 done();
             });
         });
-        it('should not do anything if job is not complete', function (done) {
-            readJobStub.yields(null, { Status: 'Processing' });
-            subject.handler(event, {}, function (error) {
-                expect(error).to.equal(null);
-                expect(readJobStub.calledOnce).to.equal(true);
-                expect(notifyStub.called).to.equal(true);
-                expect(updateObjectsMetadataStub.called).to.equal(false);
+        it('should fail due to describeStacks error', function (done) {
+            describeStacksStub.yields('describeStacksStub');
+            subject.create(event, {}, function (error, response) {
+                expect(error).to.equal('describeStacksStub');
+                expect(response).to.equal(undefined);
                 done();
             });
         });
-        it('should not do anything if get job fails', function (done) {
-            readJobStub.yields('readJobStubError');
-            subject.handler(event, {}, function (error) {
-                expect(error).to.equal('readJobStubError');
-                expect(readJobStub.calledOnce).to.equal(true);
-                expect(notifyStub.called).to.equal(false);
-                expect(updateObjectsMetadataStub.called).to.equal(false);
+        it('should fail due to describeStacks yields more than one stack', function (done) {
+            describeStacksStub.yields(null, { Stacks: [{}, {}]});
+            subject.create(event, {}, function (error, response) {
+                expect(error.message).to.equal('Found [2] matching stacks. Expected exactly 1.');
+                expect(response).to.equal(undefined);
+                done();
+            });
+        });
+        it('should fail due to listStackResources error', function (done) {
+            listStackResourcesStub.yields('listStackResources');
+            subject.create(event, {}, function (error, response) {
+                expect(error).to.equal('listStackResources');
+                expect(response).to.equal(undefined);
+                done();
+            });
+        });
+    });
+
+    describe('update', function () {
+        it('should succeed', function (done) {
+            subject.update(event, {}, function (error, response) {
+                expect(error).to.equal(null);
+                expect(response).to.be.an('object');
+                done();
+            });
+        });
+    });
+
+    describe('delete', function () {
+        it('should succeed', function (done) {
+            subject.delete(event, {}, function (error, response) {
+                expect(error).to.equal(undefined);
+                expect(response).to.equal(undefined);
                 done();
             });
         });

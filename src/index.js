@@ -11,12 +11,12 @@ pub.validate = function (event) {
     }
 };
 
-pub.create = function (event, context, callback) {
+pub.create = function (event, _context, callback) {
     describeStack(event.ResourceProperties.StackName, function (error, stack) {
         if (error) {
             return callback(error);
         }
-        describeStackResources(event.ResourceProperties.Stackname, function (error, resources) {
+        describeStackResources(event.ResourceProperties.StackName, function (error, resources) {
             if (error) {
                 return callback(error);
             }
@@ -70,6 +70,5 @@ function describeStackResources(stackName, callback) {
             return callback(error);
         }
         return callback(null, cfnResponse.StackResourceSummaries)
-
     });
 }
