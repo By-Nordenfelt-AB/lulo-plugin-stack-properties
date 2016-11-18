@@ -16,7 +16,10 @@
   "keywords": [
     "AWS",
     "CloudFormation",
-    "Custom Resource"
+    "Custom Resource",
+    "Plugin",
+    "Lulo",
+    "Lowercase"
   ],
   "author": "Carl Nordenfelt",
   "license": "MIT",
