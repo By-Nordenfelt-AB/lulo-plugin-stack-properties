@@ -1,6 +1,6 @@
 {
     "name": "lulo-plugin-stack-properties",
-    "version": "4.0.0-beta1",
+    "version": "4.0.0-beta2",
     "scripts": {
         "clean": "rm -rf node_modules package-lock.json .dist .coverage",
         "build": "tsc",
@@ -11,6 +11,9 @@
         "prepublishOnly": "npm test && npm run build"
     },
     "main": "src/index.ts",
+    "peerDependencies": {
+        "@aws-sdk/client-cloudformation": "*"
+    },
     "devDependencies": {
         "@aws-sdk/client-cloudformation": "*",
         "@types/aws-lambda": "^8.10.114",

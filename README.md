@@ -30,16 +30,13 @@ Gives ResourcePhysicalId
 
 ### Required IAM Permissions
 The Custom Resource Lambda requires the following permissions for this plugin to work:
-```
-{
-   "Sid": "lulo-plugin-stack-properties",
-   "Effect": "Allow",
-   "Action": [
-       "cloudformation:DescribeStacks",
-       "cloudformation:ListStackResources"
-   ],
-   "Resource": "*"
-}
+```yaml
+Sid: 'LuloPluginStackProperties'
+Action:
+    - 'cloudformation:DescribeStacks'
+    - 'cloudformation:ListStackResources'
+Effect: 'Allow'
+Resource: '*'
 ```
 
 ## License
