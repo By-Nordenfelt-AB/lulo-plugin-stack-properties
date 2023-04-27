@@ -1,6 +1,7 @@
 {
     "name": "lulo-plugin-stack-properties",
-    "version": "4.0.0-beta3",
+    "version": "4.0.0-beta4",
+    "type": "module",
     "main": "src/index.ts",
     "types": ".dist/index.d.ts",
     "scripts": {
