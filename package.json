@@ -1,7 +1,6 @@
 {
     "name": "lulo-plugin-stack-properties",
-    "version": "4.0.0-beta4",
-    "type": "module",
+    "version": "4.0.0-beta5",
     "main": "src/index.ts",
     "types": ".dist/index.d.ts",
     "scripts": {
@@ -17,10 +16,10 @@
         ".dist/**/*"
     ],
     "peerDependencies": {
-        "@aws-sdk/client-cloudformation": "*"
+        "@aws-sdk/client-cloudformation": "3.x"
     },
     "devDependencies": {
-        "@aws-sdk/client-cloudformation": "*",
+        "@aws-sdk/client-cloudformation": "3.x",
         "@types/aws-lambda": "^8.10.114",
         "@types/jest": "29.5.1",
         "@types/node": "18.16.0",
