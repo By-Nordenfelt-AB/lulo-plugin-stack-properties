@@ -34,7 +34,7 @@ The Custom Resource Lambda requires the following permissions for this plugin to
 Sid: 'LuloPluginStackProperties'
 Action:
     - 'cloudformation:DescribeStacks'
-    - 'cloudformation:ListStackResources'
+    - 'cloudformation:DescribeStackResources'
 Effect: 'Allow'
 Resource: '*'
 ```
