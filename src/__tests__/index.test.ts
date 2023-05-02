@@ -54,10 +54,10 @@ describe('Index unit tests', () => {
         it('should succeed', async () => {
             const response = await subject.createResource(event, {});
             expect(response).toMatchInlineSnapshot(`
-                Map {
-                  "Parameter.PKey" => "PValue",
-                  "Output.OKey" => "OValue",
-                  "Resource.Foo" => "Bar",
+                {
+                  "Output.OKey": "OValue",
+                  "Parameter.PKey": "PValue",
+                  "Resource.Foo": "Bar",
                 }
             `);
         });
@@ -73,14 +73,6 @@ describe('Index unit tests', () => {
             sendStub.mockResolvedValue({ Stacks: [{}, {}] });
             await expect(subject.createResource(event, {})).rejects.toEqual(new Error('Found [2] matching stacks. Expected exactly 1.'));
         });
-        // it('should fail due to listStackResources error', function (done) {
-        //     describeStackResourcesStub.yields('listStackResources');
-        //     subject.create(event, {}, function (error, response) {
-        //         expect(error).to.equal('listStackResources');
-        //         expect(response).to.equal(undefined);
-        //         done();
-        //     });
-        // });
     });
 
     describe('update', () => {
@@ -88,7 +80,7 @@ describe('Index unit tests', () => {
             await subject.updateResource(event, {});
         });
     });
-    //
+
     describe('delete', () => {
         it('should succeed', async () => {
             await subject.deleteResource(event, {});

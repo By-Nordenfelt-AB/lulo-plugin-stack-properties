@@ -39,7 +39,7 @@ export async function createResource(event: CloudFormationCustomResourceCreateEv
         pluginResponse.set(`Resource.${resource.LogicalResourceId}`, resource.PhysicalResourceId);
     }
 
-    return pluginResponse;
+    return Object.fromEntries(pluginResponse);
 }
 
 export async function updateResource(event: CloudFormationCustomResourceUpdateEvent, context: Partial<Context>) {
